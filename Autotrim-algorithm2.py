@@ -8,7 +8,6 @@
 # 0325fix ANC6bug => dont use ANC6, L3R3 bug
 #20190919 for loop, put 0 to -0.5
 #0920 fix dataL -> dataR
-#0923 -3 to -1  -> -2.5 to -1
 import os
 import sys
 #import datetime
