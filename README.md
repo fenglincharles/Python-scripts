@@ -1,5 +1,4 @@
-- 👋 Hi, I’m @fenglincharles
-
+- 👋 Hi, I’m Charles
 
 <!---
 fenglincharles/fenglincharles is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
