@@ -1,0 +1,86 @@
+# -*- coding: utf-8 -*-
+import scipy.signal as signal
+import pylab as pl
+import math
+import numpy as np
+import os
+import csv
+from functools import reduce 
+def design_equalizer(freq, Q, gain, Fs):
+    A = 10**(gain/40.0)
+    w0 = 2*math.pi*freq/Fs
+    alpha = math.sin(w0) / 2 / Q
+
+    b0 = 1 + alpha * A
+    b1 = -2*math.cos(w0)
+    b2 = 1 - alpha * A
+    a0 = 1 + alpha / A
+    a1 = -2*math.cos(w0)
+    a2 = 1 - alpha / A
+    return [b0/a0,b1/a0,b2/a0], [1.0, a1/a0, a2/a0]    
+samplerate=44100
+pl.figure(figsize=(8,4))
+H=[]
+#for freq in [1000,2500]:  
+#    for q in [2]:
+#        for g in [30,50]:
+#            b,a = design_equalizer(freq, q, g, samplerate)
+#            w, h = signal.freqz(b, a,worN=samplerate)
+#            H.append(h)
+#              #print(H)
+#pl.semilogx(w/np.pi*samplerate, 20*np.log10(np.abs(H[1])))
+#pl.semilogx(w/np.pi*samplerate, 20*np.log10(np.abs(H[3])))
+
+#========================Input Frequency========================
+EQ=[]
+#Frequency,Gain,Q
+EQ.append([60,3.84,0.29])
+EQ.append([1600,3,0.5])
+EQ.append([2650,-10.5,1.33])
+EQ.append([6700,-1.91,5])
+#EQ.append([7000,5,8])
+#================================================
+for E in EQ:
+  b,a = design_equalizer(E[0]/2,E[2],E[1], samplerate)
+  w, h = signal.freqz(b, a,worN=44100)
+  H.append(h)
+EQ_FREQS = [20, 21.2, 22.4,23.6,25, 26.5,28, 30, 31.5,33.5,35.5,37.5,40, 42.5,45, 47.5,50, 53, 56, 60, 63, 67, 71, 75, 80, 85, 90, 95, 100,106,112,118,125,132,140,150,160,170,180,190,200,212,224,236,250,265,280,300,315,335,355,375,400,425,450,475,500,530,560,600,630,670,710,750,800,850,900,950, 1000,1060, 1120,1180, 1250, 1320, 1400,1500,1600,1700,1800,1900,2000,2120,2240,2360,2500,2650,2800,3000,3150,3350,3550,3750,4000,4250,4500,4750,5000,5300,5600,6000,6300,6700,7100,7500,8000,8500,9000,9500,10000,10600, 11200, 11800, 12500, 13200, 14000, 15000, 16000, 17000,  18000, 19000, 20000]
+
+ProdH = reduce(lambda x,y:x*y,H)
+#TotalH=20*np.log10(np.abs(H[0]*H[1]*H[2]))
+TotalGain=20*np.log10(np.abs(ProdH))
+#pl.semilogx(w/np.pi*samplerate,20*np.log10(np.abs(H[0]*H[1]*H[2])))
+pl.semilogx(w/np.pi*samplerate,TotalGain)
+
+#========================Find EQ_FREQS from Samplerate Frequency========================
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx],TotalGain[idx]
+Test=[]
+W=w/np.pi*samplerate
+for i in EQ_FREQS:
+  Test.append(find_nearest(W,i))
+print(Test)
+#================================================
+np.asarray(Test).tofile("test.csv",sep=",",format="%s")
+
+# opening the csv file in 'a+' mode 
+file = open('test.csv', 'w+', newline ='') 
+  
+# writing the data into the file 
+with file:     
+    write = csv.writer(file) 
+    write.writerows(Test) 
+
+
+#from google.colab import files
+#files.download("test.csv")
+pl.title('Referenced EQ for SPK03D - To HtC')
+pl.xlim(20, 20000)      
+pl.xlabel("Frequency(Hz)")
+pl.ylabel("dB")
+pl.grid()
+pl.subplots_adjust(bottom=0.15)
+pl.show()
+
