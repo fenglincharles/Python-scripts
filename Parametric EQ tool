@@ -1,6 +1,6 @@
 # This code is designed for come out EQ for me to tune headset.
 # Process: Use player with realtime parametrics EQ to tuning music dynamically, than fix EQ, then using this tool to export EQ parameter than burn in to the headset.
-#Refernece: EQ Cookbook
+#Refernece: EQ Cookbook https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 #python 3.7
 # -*- coding: utf-8 -*-
 import scipy.signal as signal
